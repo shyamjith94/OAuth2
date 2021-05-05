@@ -1,3 +1,5 @@
+from abc import ABC
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User, update_last_login
 from rest_framework import serializers
@@ -9,6 +11,11 @@ JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
 
 class UserLoginSerializer(serializers.Serializer):
+    """
+    Login serializer
+    return access and refresh token
+    """
+
     username = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
@@ -33,11 +40,14 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class RefreshTokenSerializer(serializers.Serializer):
+    """
+    refresh serializer
+    return refresh and access token
+    """
+
     refresh = serializers.CharField()
 
     def validate(self, attrs):
         refresh = RefreshToken(attrs["refresh"])
-        data = {"access": str(refresh.access_token)}
-        data["refresh"] = str(refresh)
-
+        data = {"access": str(refresh.access_token), "refresh": str(refresh)}
         return data
